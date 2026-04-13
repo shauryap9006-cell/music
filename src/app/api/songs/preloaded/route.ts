@@ -2,6 +2,7 @@ import { readdir, readFile } from "fs/promises";
 import { parseBuffer } from "music-metadata";
 import path from "path";
 import { NextResponse } from "next/server";
+import { hasSupabaseEnv, supabase } from "@/backend/supabase/client";
 
 const audioPattern = /\.(mp3|flac|wav|ogg)$/i;
 const supportedExtensions = new Set(["mp3", "flac", "wav", "ogg"]);
@@ -93,6 +94,7 @@ export async function GET() {
   const previewFiles = await getAudioFiles(previewDirectory);
   const libraryFiles = await getAudioFiles(libraryDirectory);
 
+  // 1. Get local songs
   const previewSongs = await Promise.all(
     previewFiles
       .filter((file) => audioPattern.test(file))
@@ -123,5 +125,23 @@ export async function GET() {
       )
   );
 
-  return NextResponse.json([...previewSongs, ...librarySongs]);
+  // 2. Get user uploaded songs from Supabase
+  let userSongs = [];
+  if (hasSupabaseEnv && supabase) {
+    const { data } = await supabase
+      .from("songs")
+      .select("*")
+      .order("uploaded_at", { ascending: false });
+    
+    if (data) {
+      userSongs = data.map(song => ({
+        ...song,
+        folder: "User Uploads",
+        source: "uploaded"
+      }));
+    }
+  }
+
+  return NextResponse.json([...previewSongs, ...librarySongs, ...userSongs]);
 }
+
