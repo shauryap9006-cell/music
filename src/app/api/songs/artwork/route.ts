@@ -1,6 +1,7 @@
 import path from "path";
+import { readFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
-import { parseFile } from "music-metadata";
+import { parseBuffer } from "music-metadata";
 
 function resolveDirectory(scope: string | null) {
   if (scope === "preview") {
@@ -21,7 +22,8 @@ export async function GET(request: NextRequest) {
   const filePath = path.join(resolveDirectory(scope), safeFileName);
 
   try {
-    const metadata = await parseFile(filePath);
+    const buffer = await readFile(filePath);
+    const metadata = await parseBuffer(buffer);
     const picture = metadata.common.picture?.[0];
 
     if (!picture) {

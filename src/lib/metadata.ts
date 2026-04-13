@@ -1,4 +1,4 @@
-import { parseBlob } from "music-metadata-browser";
+import { parseBlob } from "music-metadata";
 
 import { createArtworkCacheKey } from "@/frontend/lib/artwork";
 import type { AudioExtension, Song } from "@/frontend/types";

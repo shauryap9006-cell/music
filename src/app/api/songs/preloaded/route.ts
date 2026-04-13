@@ -1,5 +1,5 @@
-import { readdir } from "fs/promises";
-import { parseFile } from "music-metadata";
+import { readdir, readFile } from "fs/promises";
+import { parseBuffer } from "music-metadata";
 import path from "path";
 import { NextResponse } from "next/server";
 
@@ -45,7 +45,8 @@ async function buildSongPayload({
   const filePath = path.join(directory, filename);
 
   try {
-    const metadata = await parseFile(filePath);
+    const buffer = await readFile(filePath);
+    const metadata = await parseBuffer(buffer);
     const picture = metadata.common.picture?.[0];
 
     return {
