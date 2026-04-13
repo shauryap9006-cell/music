@@ -2,12 +2,13 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./app/**/*.{ts,tsx}",
-    "./frontend/app/**/*.{ts,tsx}",
-    "./frontend/components/**/*.{ts,tsx}",
-    "./frontend/hooks/**/*.{ts,tsx}",
-    "./frontend/lib/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}"
+    "./src/app/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
+    "./src/hooks/**/*.{ts,tsx}",
+    "./src/lib/**/*.{ts,tsx}",
+    "./src/store/**/*.{ts,tsx}",
+    "./src/styles/**/*.{ts,tsx}",
+    "./src/types/**/*.{ts,tsx}"
   ],
   theme: {
     extend: {

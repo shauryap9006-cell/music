@@ -4,12 +4,14 @@ import { LoaderCircle, Music4 } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
 import { useAudioController } from "@/frontend/components/providers/AudioProvider";
-import { GlassCard } from "@/frontend/components/ui/GlassCard";
+
 import { useLyrics } from "@/frontend/hooks/useLyrics";
 import { LyricLine } from "@/frontend/components/lyrics/LyricLine";
 
 const VISIBLE_LINES = 5; // Show 5 lines at a time
 const CENTER_OFFSET = 2; // Active line is 3rd (index 2) in the window
+
+const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E")`;
 
 export function LyricsPanel() {
   const { currentSong, progress } = useAudioController();
@@ -48,19 +50,31 @@ export function LyricsPanel() {
   }, [activeIndex]);
 
   return (
-    <GlassCard className="relative flex h-full flex-col overflow-hidden p-5">
-      {/* Ambient background */}
-      <div className="absolute inset-0 opacity-20">
-        <div
-          className="absolute inset-0 blur-3xl"
-          style={{
-            background: currentSong?.artUrl
-              ? `center / cover no-repeat url(${currentSong.artUrl})`
-              : `radial-gradient(circle, ${currentSong?.dominantColor ?? "#1e293b"}, transparent 70%)`
-          }}
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,9,11,0.3),rgba(9,9,11,0.96))]" />
-      </div>
+    <div 
+      className="relative flex h-full flex-col overflow-hidden p-6 rounded-3xl"
+      style={{
+        background: "#0b0a0aff",
+        boxShadow: "0 4px 60px rgba(0,0,0,0.8), inset 0 -1px 0 rgba(0,0,0,0.7)",
+      }}
+    >
+      {/* noise texture overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10 rounded-3xl"
+        style={{
+          backgroundImage: NOISE_SVG,
+          backgroundRepeat: "repeat",
+          backgroundSize: "128px 128px",
+          mixBlendMode: "overlay",
+          opacity: 0.5,
+        }}
+      />
+      {/* inner border highlight */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10 rounded-3xl"
+        style={{ border: "1px solid rgba(0, 0, 0, 0.04)" }}
+      />
+
+     
 
       {/* Header */}
       <div className="relative flex items-center justify-between gap-4">
@@ -142,6 +156,6 @@ export function LyricsPanel() {
           </div>
         ) : null}
       </div>
-    </GlassCard>
+    </div>
   );
 }

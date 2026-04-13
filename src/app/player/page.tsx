@@ -52,8 +52,8 @@ export default function PlayerPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      {/* Background video — sits behind everything */}
+    <div className="relative min-h-screen w-full overflow-x-hidden">
+      {/* LAYER 0: Background video — extreme back */}
       <video
         autoPlay
         loop
@@ -64,7 +64,7 @@ export default function PlayerPage() {
         src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260406_133058_0504132a-0cf3-4450-a370-8ea3b05c95d4.mp4"
       />
 
-      {/* Dark overlay for readability */}
+      {/* LAYER 1: Dark overlay for readability */}
       <div
         className="pointer-events-none fixed inset-0"
         style={{
@@ -74,7 +74,7 @@ export default function PlayerPage() {
         }}
       />
 
-      {/* Page content — above the video */}
+      {/* LAYER 2: Page content — above the video */}
       <motion.main
         className="relative mx-auto flex flex-col items-center w-full max-w-4xl px-6 py-6 md:px-10 gap-8"
         style={{ zIndex: 2 }}
@@ -170,7 +170,7 @@ export default function PlayerPage() {
                 className="w-full overflow-hidden"
                 key="eq-panel"
               >
-                <div className="pb-4">
+                <div className="min-h-[400px] w-full">
                   <EQPanel />
                 </div>
               </motion.div>

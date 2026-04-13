@@ -191,8 +191,8 @@ const FlipCard = React.memo(({
             const phase = phaseValue as number;
             const morph = morphValue as number;
             
-            // Materialization Fade (0 to 0.6 over the first 0.1 of phase)
-            const materialOpacity = phase < 0.1 ? (phase / 0.1) * 0.6 : 0.6;
+            // Materialization Fade (0 to 0.85 over the first 0.1 of phase)
+            const materialOpacity = phase < 0.1 ? (phase / 0.1) * 0.85 : 0.85;
             
             if (phase < 2 || morph < 0.1) return materialOpacity;
 

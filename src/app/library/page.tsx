@@ -78,8 +78,8 @@ export default function LibraryPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      {/* Background video — rotated 180° (upside down) */}
+    <div className="relative min-h-screen w-full overflow-x-hidden">
+      {/* LAYER 0: Background video — extreme back, rotated 180° (upside down) */}
       <video
         autoPlay
         loop

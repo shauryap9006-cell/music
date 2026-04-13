@@ -32,9 +32,8 @@ export function Playlist() {
     <div
       className="relative flex h-full flex-col gap-3 overflow-hidden rounded-3xl p-4"
       style={{
-        background: "#0c0c0c",
-        boxShadow:
-          "0 2px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.6)",
+        background: "#050505",
+        boxShadow: "0 4px 60px rgba(0,0,0,0.8), inset 0 -1px 0 rgba(0,0,0,0.7)",
       }}
     >
       {/* noise texture overlay */}

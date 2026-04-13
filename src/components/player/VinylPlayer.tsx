@@ -69,7 +69,17 @@ function GrooveRings() {
 }
 
 /* ─── tonearm SVG ─── */
-function Tonearm({ angle }: { angle: number }) {
+function Tonearm({ 
+  angle,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp
+}: { 
+  angle: number;
+  onPointerDown?: (e: React.PointerEvent) => void;
+  onPointerMove?: (e: React.PointerEvent) => void;
+  onPointerUp?: (e: React.PointerEvent) => void;
+}) {
   return (
     <motion.div
       className="absolute z-20"
@@ -99,6 +109,20 @@ function Tonearm({ angle }: { angle: number }) {
         <rect x="45" y="258" width="10" height="14" rx="1" fill="#333" transform="rotate(-10 50 265)" />
         {/* stylus */}
         <line x1="50" y1="273" x2="50" y2="280" stroke="#ccc" strokeWidth="1.5" transform="rotate(-10 50 276)" />
+
+        {/* INTERACTION AREA for grab */}
+        <rect 
+          x="20" y="220" width="60" height="80" 
+          fill="transparent" 
+          cursor="grab"
+          pointerEvents="all"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          transform="rotate(-10 50 255)"
+          className="active:cursor-grabbing"
+        />
 
         {/* arm highlight gradient */}
         <defs>
@@ -219,20 +243,78 @@ export function VinylPlayer({
 }: VinylPlayerProps) {
   const RepeatIcon = repeatMode === "one" ? Repeat1 : Repeat;
 
-  // Tonearm: resting at -30° when paused/no song, sweeps from -25° to 2° with progress
-  const tonearmAngle = !currentSong
-    ? -30
-    : !isPlaying && progressPercent === 0
-      ? -30
-      : -25 + (progressPercent / 100) * 27;
+  // Deck and Dragging State
+  const deckRef = useRef<HTMLDivElement>(null);
+  const [draggingTonearm, setDraggingTonearm] = useState(false);
+  const [dragAngle, setDragAngle] = useState(0);
+  const dragData = useRef({ startAngle: 0, startMouseAngle: 0 });
+
+  // Resting at -45° when paused/no song (off the record), sweeps from -25° to 2° with progress.
+  const targetAngle = !currentSong || !isPlaying
+    ? -45
+    : -35 + (progressPercent / 100) * 27;
+
+  const currentAngle = draggingTonearm ? dragAngle : targetAngle;
+
+  const getMouseAngle = useCallback((clientX: number, clientY: number) => {
+    if (!deckRef.current) return 0;
+    const rect = deckRef.current.getBoundingClientRect();
+    const pivotX = rect.left + rect.width * 0.86;
+    const pivotY = rect.top + rect.height * 0.028;
+    const dx = clientX - pivotX;
+    const dy = clientY - pivotY;
+    return Math.atan2(dy, dx) * (180 / Math.PI);
+  }, []);
+
+  const handleTonearmPointerDown = useCallback((e: React.PointerEvent) => {
+    if (!currentSong) return;
+    (e.target as Element).setPointerCapture(e.pointerId);
+    setDraggingTonearm(true);
+    const mAngle = getMouseAngle(e.clientX, e.clientY);
+    setDragAngle(targetAngle);
+    dragData.current = { startAngle: targetAngle, startMouseAngle: mAngle };
+  }, [currentSong, getMouseAngle, targetAngle]);
+
+  const handleTonearmPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!draggingTonearm) return;
+    const mAngle = getMouseAngle(e.clientX, e.clientY);
+    let delta = mAngle - dragData.current.startMouseAngle;
+    
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+
+    let newAngle = dragData.current.startAngle + delta;
+    if (newAngle < -45) newAngle = -45; // Constrain to new resting angle
+    if (newAngle > 5) newAngle = 5;
+
+    setDragAngle(newAngle);
+  }, [draggingTonearm, getMouseAngle]);
+
+  const handleTonearmPointerUp = useCallback((e: React.PointerEvent) => {
+    if (!draggingTonearm) return;
+    setDraggingTonearm(false);
+    (e.target as Element).releasePointerCapture(e.pointerId);
+
+    // Map drag angle back to progress using the user's [-35 to -8] range
+    let seekProgress = (dragAngle + 35) / 27;
+    if (seekProgress < 0) seekProgress = 0;
+    if (seekProgress > 1) seekProgress = 1;
+    
+    onSeek(seekProgress * duration);
+  }, [draggingTonearm, dragAngle, duration, onSeek]);
+
+  // Calculate live preview time to update progress bar while dragging tonearm
+  const dragProgressRaw = (dragAngle + 35) / 27;
+  const clampedDragProgress = Math.max(0, Math.min(1, dragProgressRaw));
+  const displayTime = draggingTonearm ? clampedDragProgress * duration : progress;
 
   return (
     <div
       className="relative w-full overflow-hidden rounded-3xl"
       style={{
-        background: "#0c0c0c",
+        background: "#0a0909ff",
         boxShadow:
-          "0 2px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.6)",
+          "0 4px 60px rgba(0,0,0,2), inset 0 -1px 0 rgba(0,0,0,2)",
       }}
     >
       {/* noise texture overlay */}
@@ -262,7 +344,7 @@ export function VinylPlayer({
         </p>
 
         {/* turntable deck */}
-        <div className="relative w-full max-w-[420px] aspect-square">
+        <div ref={deckRef} className="relative w-full max-w-[420px] aspect-square">
           {/* platter base shadow */}
           <div
             className="absolute inset-[4%] rounded-full"
@@ -356,7 +438,12 @@ export function VinylPlayer({
           </motion.div>
 
           {/* tonearm */}
-          <Tonearm angle={tonearmAngle} />
+          <Tonearm 
+            angle={currentAngle}
+            onPointerDown={handleTonearmPointerDown}
+            onPointerMove={handleTonearmPointerMove}
+            onPointerUp={handleTonearmPointerUp}
+          />
         </div>
 
         {/* song info */}
@@ -382,7 +469,7 @@ export function VinylPlayer({
 
         {/* progress bar */}
         <div className="w-full max-w-md">
-          <VinylProgressBar currentTime={progress} duration={duration} onSeek={onSeek} />
+          <VinylProgressBar currentTime={displayTime} duration={duration} onSeek={onSeek} />
         </div>
 
         {/* controls */}

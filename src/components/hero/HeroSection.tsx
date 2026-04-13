@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import React, { useEffect, useRef } from "react";
+import { motion, useTransform, useMotionValue } from "framer-motion";
 import { IntroAnimation, MAX_SCROLL } from "@/frontend/components/ui/scroll-morph-hero";
 import { SearchBar } from "@/frontend/components/hero/SearchBar";
-import { Play, Library, Home } from "lucide-react";
+import { Play, Library } from "lucide-react";
 import { useAudioController } from "@/frontend/components/providers/AudioProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -79,30 +79,35 @@ export function HeroSection() {
   const buttonsPointerEvents = useTransform(virtualScroll, (v) => v > 1200 ? "auto" : "none");
 
   return (
-    <main ref={containerRef} className="pb-10 bg-black min-h-screen select-none relative overflow-hidden">
-      {/* Morphological Hero Animation (Background) */}
-      <section className="relative w-full h-[100vh]">
-        {/* Cinematic Video Background */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover opacity-80"
-          >
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260330_145725_08886141-ed95-4a8e-8d6d-b75eaadce638.mp4" type="video/mp4" />
-          </video>
-          {/* Subtle overlay to help text readability */}
-          <div className="absolute inset-0 bg-black/30" />
-        </div>
+    <main ref={containerRef} className="bg-black min-h-screen select-none relative overflow-hidden">
+      {/* LAYER 0: Cinematic Video Background — EXTREME BACK */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="fixed inset-0 w-full h-full object-cover pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260330_145725_08886141-ed95-4a8e-8d6d-b75eaadce638.mp4" type="video/mp4" />
+      </video>
+      {/* Dark overlay for readability on top of video */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          zIndex: 1,
+          background: "linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.35) 70%, rgba(0,0,0,0.60) 100%)",
+        }}
+      />
 
-        <div className="absolute inset-0 z-10">
+      {/* LAYER 1: Morphological Hero Scroll Animation */}
+      <section className="relative w-full h-[100vh]" style={{ zIndex: 2 }}>
+        <div className="absolute inset-0">
           <IntroAnimation virtualScroll={virtualScroll} />
         </div>
 
-        {/* Overlay Container - Perfectly Centered */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 pointer-events-none">
+        {/* LAYER 2: Overlay Container - Text & Buttons on top of everything */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center h-full text-center px-6 pointer-events-none" style={{ zIndex: 10 }}>
 
           {/* Layer 0: Central Decoration (Pulsing Heartbeat) */}
           <motion.div
