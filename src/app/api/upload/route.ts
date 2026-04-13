@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     parsedMetadata = await parseBuffer(
       buffer,
       {
-        mimeType: file.type || "audio/mpeg",
-        size: file.size
+        mimeType: mimeType || "audio/mpeg",
+        size: size
       },
       { duration: true }
     );
