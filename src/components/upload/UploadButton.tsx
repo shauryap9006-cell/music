@@ -1,5 +1,6 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { Upload, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -12,14 +13,26 @@ export function UploadButton() {
   const handleFiles = async (files: FileList) => {
     setIsUploading(true);
     for (const file of Array.from(files)) {
-      const form = new FormData();
-
-      form.append("file", file);
-
       try {
+        // 1. Upload directly to Vercel Blob from the browser
+        // This bypasses the 4.5MB Server Request limit on Vercel
+        const blob = await upload(`library/${Date.now()}-${file.name}`, file, {
+          access: 'public',
+          handleUploadUrl: '/api/upload/token',
+        });
+
+        // 2. Post the resulting URL to our backend to extract metadata & save to DB
         const res = await fetch("/api/upload", {
           method: "POST",
-          body: form
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: blob.url,
+            filename: file.name,
+            mimeType: file.type || 'audio/mpeg',
+            size: file.size
+          })
         });
 
         if (!res.ok) {

@@ -22,14 +22,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const form = await req.formData();
-  const file = form.get("file") as File | null;
+  const { url, filename, mimeType, size } = await req.json();
 
-  if (!file) {
-    return NextResponse.json({ error: "file required" }, { status: 400 });
+  if (!url || !filename) {
+    return NextResponse.json({ error: "url and filename required" }, { status: 400 });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  // Fetch the uploaded blob from Vercel's Blob storage directly into the server's memory.
+  // This bypasses the 4.5MB Incoming Payload Limit of Vercel Serverless Functions
+  // because the fetch happens internally!
+  const response = await fetch(url);
+  const buffer = Buffer.from(await response.arrayBuffer());
   let parsedMetadata = null;
 
   try {
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
     console.error("Metadata parse error:", e);
   }
 
-  const title = parsedMetadata?.common.title?.trim() || cleanTitle(file.name);
+  const title = parsedMetadata?.common.title?.trim() || cleanTitle(filename);
   const artist = parsedMetadata?.common.artist?.trim() || 
                  parsedMetadata?.common.artists?.filter(Boolean).join(", ") || 
                  "Unknown Artist";
@@ -74,20 +77,14 @@ export async function POST(req: NextRequest) {
     let posterUrl = null;
     const cover = parsedMetadata?.common.picture?.[0];
     if (cover) {
-      const coverBlob = await put(`artwork/${Date.now()}-${file.name}.jpg`, Buffer.from(cover.data), {
+      const coverBlob = await put(`artwork/${Date.now()}-${filename}.jpg`, Buffer.from(cover.data), {
         access: "public",
         contentType: cover.format || "image/jpeg"
       });
       posterUrl = coverBlob.url;
     }
 
-    // 2. Upload Audio to Vercel Blob
-    const audioBlob = await put(`library/${Date.now()}-${file.name}`, buffer, {
-      access: "public",
-      contentType: file.type || "audio/mpeg"
-    });
-
-    // 3. Insert into Supabase
+    // 2. Insert into Supabase
     const { data, error: dbError } = await supabase
       .from("songs")
       .insert({
@@ -96,9 +93,9 @@ export async function POST(req: NextRequest) {
         album,
         genre,
         duration,
-        audio_url: audioBlob.url,
+        audio_url: url, // Use the original URL which is already hosted
         poster_url: posterUrl,
-        file_size: file.size,
+        file_size: size,
         source: "uploaded"
       })
       .select()
