@@ -1,0 +1,61 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@/frontend/*": ["./frontend/*"],
+      "@/frontend/components/*": ["./frontend/components/*"],
+      "@/frontend/hooks/*": ["./frontend/hooks/*"],
+      "@/frontend/store/*": ["./frontend/store/*"],
+      "@/frontend/lib/*": ["./frontend/lib/*"],
+      "@/frontend/styles/*": ["./frontend/styles/*"],
+      "@/frontend/types": ["./frontend/types/index.ts"],
+      "@/frontend/types/*": ["./frontend/types/*"],
+      "@/backend/*": ["./backend/*"],
+      "@/components/*": ["./frontend/components/*"],
+      "@/hooks/*": ["./frontend/hooks/*"],
+      "@/store/*": ["./frontend/store/*"],
+      "@/lib/*": ["./frontend/lib/*"],
+      "@/styles/*": ["./frontend/styles/*"],
+      "@/types": ["./frontend/types/index.ts"],
+      "@/types/*": ["./frontend/types/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "components",
+    "hooks",
+    "lib",
+    "store",
+    "styles",
+    "types",
+    "frontend/components/components",
+    "frontend/hooks/hooks",
+    "frontend/lib/lib",
+    "frontend/store/store",
+    "frontend/styles/styles",
+    "frontend/types/types",
+    "frontend/app/library/library",
+    "frontend/app/player/player",
+    "frontend/app/search/search"
+  ]
+}

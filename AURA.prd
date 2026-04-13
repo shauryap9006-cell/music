@@ -1,0 +1,433 @@
+﻿# AURA â€” Product Requirements Document
+**Version:** 1.1  
+**Date:** April 2026  
+**Status:** Draft  
+
+---
+
+## 1. Product Overview
+
+Aura is a visually stunning, animation-rich music player web app built for personal and small-group use. It combines a cinematic landing page with a fully-featured player â€” no login, no signup, just open and listen.
+
+Users load a local folder of songs and Aura handles everything: playback, visualization, synced lyrics, equalization, and library management â€” all wrapped in a dark glassmorphism interface powered by heavy Framer Motion animations.
+
+---
+
+## 2. Goals & Non-Goals
+
+### Goals
+- Deliver a uniquely aesthetic, animation-first music experience
+- Allow instant use â€” no login, no account, no setup
+- Support local folder loading with rich metadata display
+- Ensure every song always renders poster art through a deterministic fallback chain
+- Full audio controls: visualizer, synced lyrics, equalizer, shuffle, repeat
+- Fast and smooth on PC/laptop browsers
+
+### Non-Goals (v1)
+- No mobile support
+- No user accounts or cloud sync
+- No paid streaming integration (Spotify, Apple Music)
+- No social or collaborative features
+
+---
+
+## 3. Target Users
+
+| Attribute      | Detail                                      |
+|----------------|---------------------------------------------|
+| Who            | Creator + small friend group (2â€“10 people)  |
+| Device         | PC / Laptop (Windows or Mac)                |
+| Browser        | Chrome, Firefox, Edge â€” latest versions     |
+| Tech comfort   | Moderate â€” can open a folder, use a browser |
+| Expectation    | Polished, fast, beautiful â€” not generic     |
+
+---
+
+## 4. Tech Stack
+
+| Layer             | Technology                                                  |
+|-------------------|-------------------------------------------------------------|
+| Framework         | Next.js 14 (App Router) + TypeScript                        |
+| Styling           | Tailwind CSS v3 + CSS custom properties                     |
+| Animations        | Framer Motion (primary) + CSS transitions                   |
+| Audio Engine      | Howler.js                                                   |
+| Visualizer        | Web Audio API â€” AnalyserNode + Canvas                       |
+| ID3 Tag Parser    | music-metadata-browser                                      |
+| Lyrics            | LRCLIB API (free, no key, synced LRC)                       |
+| Artwork Resolver  | Embedded ID3 art -> iTunes Search API -> Pollinations.ai fallback |
+| State Management  | Zustand                                                     |
+| Icons             | Lucide React                                                |
+| Fonts             | Syne (headings) + DM Sans (body)                            |
+
+### Why Next.js?
+- File-based routing â€” each page is a clean route
+- Built-in performance (image, font, code splitting)
+- TypeScript out of the box
+- Easy to add API routes later
+
+### Preview Songs Recommendation
+Use **Pixabay Music** (pixabay.com/music):
+- 100% free, no attribution required
+- Modern, high quality MP3s
+- Come with metadata and album art
+- Download 5â€“8 tracks and place in `/public/preview-songs/`
+
+---
+
+### v1 External API Plan
+
+| Capability       | Provider          | Why it is locked for v1                                     |
+|-----------------|-------------------|-------------------------------------------------------------|
+| Synced lyrics    | LRCLIB API        | Free, no auth, reliable enough for local-library playback   |
+| Official covers  | iTunes Search API | Free, no key, strong catalog coverage, official album art   |
+| Fallback posters | Pollinations.ai   | Zero-setup image generation when no embedded/official art exists |
+
+**Implementation rule:** Aura should use embedded art on the client when available, then call a single artwork resolver endpoint for iTunes matching and AI fallback. This keeps provider logic centralized and easy to swap later.
+
+## 5. Design System
+
+### 5.1 Color Palette
+
+| Token             | Value                                          |
+|-------------------|------------------------------------------------|
+| Background base   | #06040F â€” near black with purple undertone     |
+| Surface / card    | rgba(255,255,255,0.06) â€” glassmorphism layer   |
+| Border            | rgba(255,255,255,0.12) â€” subtle white outline  |
+| Accent primary    | #A78BFA â€” soft violet                          |
+| Accent secondary  | #F472B6 â€” hot pink                             |
+| Text primary      | rgba(255,255,255,0.92)                         |
+| Text muted        | rgba(255,255,255,0.45)                         |
+| Text dim          | rgba(255,255,255,0.25)                         |
+| Blob 1            | #7C3AED â€” animated background glow             |
+| Blob 2            | #BE185D â€” animated background glow             |
+| Blob 3            | #1D4ED8 â€” animated background glow             |
+
+### 5.2 Typography
+
+| Role          | Font                                  |
+|---------------|---------------------------------------|
+| Display/Logo  | Syne 800 â€” hero titles, app name      |
+| Headings      | Syne 700 â€” section headings           |
+| Body          | DM Sans 400 â€” descriptions, metadata  |
+| Labels/Mono   | DM Mono â€” time codes, technical text  |
+
+### 5.3 Glassmorphism Spec
+```css
+backdrop-filter: blur(28px) saturate(1.4);
+background: rgba(255, 255, 255, 0.06);
+border: 1px solid rgba(255, 255, 255, 0.12);
+border-radius: 24px;
+box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+```
+
+### 5.4 Animation Principles
+
+| Element          | Approach                                                          |
+|------------------|-------------------------------------------------------------------|
+| Page transitions | Framer Motion â€” fade + slide (y: 20 â†’ 0, opacity 0 â†’ 1)          |
+| Scroll reveals   | useInView â€” staggered children entrance                           |
+| Hero parallax    | useScroll + useTransform â€” layers at different speeds             |
+| Album art        | CSS rotate 20s linear infinite (pauses when stopped)             |
+| Visualizer       | requestAnimationFrame + AnalyserNode canvas                       |
+| Hover states     | scale(1.04) spring (stiffness: 300, damping: 20)                  |
+| Modal / drawer   | AnimatePresence â€” slide up, fade overlay                          |
+| Lyrics           | Framer Motion layout â€” active line scales + highlights smoothly   |
+
+---
+
+## 6. Pages & Screens
+
+### 6.1 Hero Page â€” `/`
+
+The entry point. Cinematic, scroll-driven, makes an instant impression.
+
+**Sections (top to bottom):**
+
+**Navbar**
+- App name "Aura" left, "Open Player" CTA right
+- Frosted glass, sticks on scroll
+
+**Hero Section**
+- Full viewport height
+- Large animated title (staggered letter reveal)
+- Animated gradient blob background
+- Floating album art cards in parallax
+- Tagline fades in after title
+
+**Preview Player Strip**
+- Horizontal scroll row of 5â€“8 Pixabay songs
+- Click card â†’ plays 30s preview inline
+- Mini waveform visualizer on active card
+- Card shows: album art, title, artist, genre tag
+
+**Features Showcase**
+- 3 animated cards (scroll reveal): Visualizer, Synced Lyrics, Equalizer
+- Each with icon, short description, looping micro-animation
+
+**Search Bar**
+- Pinned at bottom of hero
+- Large, centered, frosted glass input
+- Placeholder: "Search your music library..."
+- Live results from local library if already loaded
+- Enter â†’ navigates to /search
+
+---
+
+### 6.2 Player Page â€” `/player`
+
+The main experience. 3-panel layout.
+
+**Left Panel â€” Playlist Sidebar**
+- Logo + "Open Folder" button
+- Scrollable song list (staggered entrance animation)
+- Active song: glow border + equalizer bar animation
+- Song row: thumbnail, title, artist, duration
+- Drag to reorder (Framer Motion drag)
+
+**Centre Panel â€” Main Player**
+- Background blurs + shifts to dominant album art color
+- Rotating album art circle (pauses when stopped)
+- Pulsing ring around art when playing
+- Song title + artist crossfade on track change
+- Seekable progress bar with current/total time
+- Controls: Previous Â· Play/Pause (large gradient button) Â· Next
+- Secondary: Shuffle Â· Repeat (none/one/all) Â· Volume slider
+- Canvas frequency bar visualizer below album art
+
+**Right Panel â€” Lyrics**
+- Fetches synced LRC from LRCLIB API
+- Active line: highlighted + scaled up (Framer Motion layout)
+- Past lines fade, future lines dimmed
+- Auto-scrolls to keep active line centred
+- Fallback: plain text or "Lyrics not available"
+
+**Bottom Bar â€” Equalizer**
+- Toggle to expand/collapse EQ panel (AnimatePresence height)
+- 5-band EQ via BiquadFilterNode chain
+- Animated spring-physics slider knobs
+- Presets: Flat Â· Bass Boost Â· Vocal Â· Electronic Â· Classical
+
+---
+
+### 6.3 Library Page â€” `/library`
+
+Browse the full local song collection.
+
+- Grid view of album art cards + list view toggle (animated)
+- Filter: All Â· Albums Â· Artists Â· Recently Added
+- Sort: Aâ€“Z Â· Zâ€“A Â· Duration Â· Most Played
+- Scroll reveal stagger on card grid (0.05s per card)
+- Click album â†’ expands inline to show tracks (height animation)
+- Click song â†’ opens Player with that song
+- Song count + total duration at top
+
+---
+
+### 6.4 Search Page â€” `/search`
+
+Fast live search across the local library.
+
+- Large hero search input (auto-focused)
+- Results appear as user types (debounced 150ms)
+- Grouped by: Songs Â· Albums Â· Artists
+- Each row: album art, title, artist, duration, play button
+- Animated results list (stagger entrance, exit on clear)
+- Empty state: animated illustration + "No results for X"
+- Recent searches stored in localStorage
+
+---
+
+## 7. Feature Specifications
+
+### 7.1 Local Folder Loading
+- Native folder picker via `<input webkitdirectory>`
+- Reads .mp3, .flac, .wav, .ogg files
+- Parses ID3 tags: title, artist, album, year, album art
+- Falls back to filename if tags missing
+- Embedded album art extracted as Blob URL and treated as poster priority #1
+- Song list populates Zustand store
+- Last folder path persisted in localStorage
+
+### 7.2 Poster / Artwork Resolution
+
+Aura should never display a blank album card, queue item, or player poster. Artwork resolution runs automatically in this order:
+
+| Priority | Source             | Rule                                                                  |
+|----------|--------------------|-----------------------------------------------------------------------|
+| 1        | Embedded ID3 art   | Use immediately if the local audio file already contains cover art    |
+| 2        | iTunes Search API  | Search the real track/album and use the best matching official cover  |
+| 3        | AI generated poster| Generate a mood-based fallback only when the first two layers fail    |
+
+**iTunes cover lookup**
+- Endpoint: `https://itunes.apple.com/search?term={artist} {title}&entity=song&limit=5`
+- Match using normalized artist + title first; album name is an extra confidence signal when available
+- Upgrade `artworkUrl100` to `600x600` before rendering
+- Cache the resolved result by a stable song fingerprint such as `artist|title|album|duration`
+
+**AI fallback poster**
+- Provider: Pollinations.ai for v1 because it requires no key and no account setup
+- Prompt base: `album cover art, {genre_or_mood}, cinematic, high quality, no text`
+- Mood is inferred from `genre` when present; otherwise default to `abstract colorful music`
+- Generated art is decorative fallback only and should be tagged internally as `source: ai`
+
+**Genre to mood prompt map**
+
+| Genre      | Prompt direction                                      |
+|------------|--------------------------------------------------------|
+| Hip-Hop    | Urban street art, dark moody, neon lights             |
+| Electronic | Abstract geometric forms, synthwave glow, luminous    |
+| Classical  | Elegant marble, renaissance mood, soft golden light   |
+| Lo-Fi      | Cozy room, anime-inspired warmth, soft grain          |
+| Rock       | Dramatic lightning, dark sky, bold energy             |
+| Jazz       | Smoky club, vintage texture, warm amber tones         |
+
+**Artwork resolver contract**
+- Client behavior: if embedded art exists, skip network lookup entirely
+- API route: `GET /api/artwork?artist=&title=&album=&genre=`
+- Response: resolved `source`, `imageUrl`, and optional `prompt` when the fallback is AI-generated
+- Fallback safety: if iTunes returns no confident match, do not guess a wrong cover; switch to AI
+
+### 7.3 Audio Visualizer
+- Chain: AudioContext â†’ MediaElementSource â†’ AnalyserNode â†’ Destination
+- FFT size: 256
+- Canvas renders 64 frequency bars
+- Bar gradient: accent primary â†’ accent secondary
+- 60fps via requestAnimationFrame
+- Pauses when song is paused
+
+### 7.4 Synced Lyrics
+
+| Property      | Detail                                                        |
+|---------------|---------------------------------------------------------------|
+| API           | https://lrclib.net/api/get?artist_name=X&track_name=Y        |
+| Format        | LRC (timestamp + text lines)                                  |
+| Sync method   | setInterval 250ms checks currentTime vs lyric timestamps      |
+| Active line   | Framer Motion layoutId â€” smooth size + opacity transition     |
+| Scroll        | scrollIntoView({ behavior: 'smooth', block: 'center' })       |
+| Fallback      | Plain text if synced not available                            |
+| No lyrics     | Friendly empty state with blurred song art background         |
+
+### 7.5 Equalizer Bands
+
+| Band       | Frequency | Effect                  |
+|------------|-----------|-------------------------|
+| Sub Bass   | 60 Hz     | Depth and rumble        |
+| Bass       | 250 Hz    | Body and warmth         |
+| Midrange   | 1 kHz     | Vocals and instruments  |
+| Presence   | 4 kHz     | Clarity and definition  |
+| Brilliance | 12 kHz    | Air and sparkle         |
+
+### 7.6 Keyboard Shortcuts
+
+| Action         | Key                     |
+|----------------|-------------------------|
+| Play / Pause   | Space                   |
+| Next track     | Arrow Right             |
+| Previous track | Arrow Left              |
+| Seek forward   | Shift + Arrow Right     |
+| Seek back      | Shift + Arrow Left      |
+| Volume up/down | Arrow Up / Arrow Down   |
+| Mute           | M                       |
+| Shuffle        | S                       |
+| Repeat         | R                       |
+| Fullscreen     | F                       |
+
+---
+
+## 8. File Structure
+
+```
+aura/
+â”œâ”€â”€ app/
+â”‚   â”œâ”€â”€ page.tsx                   â†’ Hero page
+â”‚   â”œâ”€â”€ player/page.tsx            â†’ Player page
+â”‚   â”œâ”€â”€ library/page.tsx           â†’ Library page
+â”‚   â”œâ”€â”€ search/page.tsx            â†’ Search page
+â”‚   â””â”€â”€ layout.tsx                 â†’ Root layout + fonts
+â”œâ”€â”€ components/
+â”‚   â”œâ”€â”€ hero/
+â”‚   â”‚   â”œâ”€â”€ HeroSection.tsx
+â”‚   â”‚   â”œâ”€â”€ PreviewStrip.tsx
+â”‚   â”‚   â””â”€â”€ SearchBar.tsx
+â”‚   â”œâ”€â”€ player/
+â”‚   â”‚   â”œâ”€â”€ AlbumArt.tsx
+â”‚   â”‚   â”œâ”€â”€ Controls.tsx
+â”‚   â”‚   â”œâ”€â”€ ProgressBar.tsx
+â”‚   â”‚   â””â”€â”€ Visualizer.tsx
+â”‚   â”œâ”€â”€ lyrics/
+â”‚   â”‚   â”œâ”€â”€ LyricsPanel.tsx
+â”‚   â”‚   â””â”€â”€ LyricLine.tsx
+â”‚   â”œâ”€â”€ equalizer/
+â”‚   â”‚   â”œâ”€â”€ EQPanel.tsx
+â”‚   â”‚   â”œâ”€â”€ EQSlider.tsx
+â”‚   â”‚   â””â”€â”€ EQPresets.tsx
+â”‚   â”œâ”€â”€ library/
+â”‚   â”‚   â”œâ”€â”€ SongGrid.tsx
+â”‚   â”‚   â”œâ”€â”€ AlbumCard.tsx
+â”‚   â”‚   â””â”€â”€ SongRow.tsx
+â”‚   â”œâ”€â”€ sidebar/
+â”‚   â”‚   â”œâ”€â”€ Playlist.tsx
+â”‚   â”‚   â””â”€â”€ SongItem.tsx
+â”‚   â””â”€â”€ ui/
+â”‚       â”œâ”€â”€ Button.tsx
+â”‚       â”œâ”€â”€ Slider.tsx
+â”‚       â”œâ”€â”€ Badge.tsx
+â”‚       â””â”€â”€ GlassCard.tsx
+â”œâ”€â”€ store/
+â”‚   â””â”€â”€ player.store.ts            â†’ Zustand: songs, currentIndex, playback state
+â”œâ”€â”€ hooks/
+â”‚   â”œâ”€â”€ useAudio.ts                â†’ Howler.js wrapper
+â”‚   â”œâ”€â”€ useVisualizer.ts           â†’ Web Audio API + canvas
+â”‚   â”œâ”€â”€ useLyrics.ts               â†’ LRCLIB fetch + sync
+â”‚   â””â”€â”€ useEqualizer.ts            â†’ BiquadFilterNode chain
+â”œâ”€â”€ lib/
+â”‚   â”œâ”€â”€ metadata.ts                â†’ music-metadata-browser parser
+â”‚   â”œâ”€â”€ lyrics.ts                  â†’ LRC parser + LRCLIB client
+â”‚   â””â”€â”€ audio.ts                   â†’ AudioContext singleton
+â”œâ”€â”€ public/
+â”‚   â””â”€â”€ preview-songs/             â†’ 5â€“8 MP3s from Pixabay Music
+â”œâ”€â”€ styles/
+â”‚   â””â”€â”€ globals.css                â†’ CSS variables, glassmorphism utilities
+â””â”€â”€ types/
+    â””â”€â”€ index.ts                   â†’ Song, Lyric, EQBand, PlayerState types
+```
+
+---
+
+### Additional v1 Artwork Modules
+- `app/api/artwork/route.ts` -> server-side resolver for iTunes matching and AI fallback selection
+- `hooks/useArtwork.ts` -> poster loading state, cache lookup, and fallback orchestration
+- `lib/artwork.ts` -> normalization, provider clients, and source selection helpers
+- `lib/posterPrompts.ts` -> genre-to-mood prompt mapping for generated posters
+
+## 9. Build Milestones
+
+| Week   | Milestone              | Deliverable                                                          |
+|--------|------------------------|----------------------------------------------------------------------|
+| Week 1 | Setup + Hero           | Next.js + Tailwind + Framer Motion. Blobs, title animation, navbar.  |
+| Week 2 | Preview Strip + Search | Pixabay songs in /public. Preview player. Search bar UI.             |
+| Week 3 | Player Core            | Folder loading, metadata, poster fallback pipeline, Howler.js, sidebar, basic controls. |
+| Week 4 | Visualizer + EQ        | Web Audio visualizer. BiquadFilter EQ. Presets. Animated sliders.    |
+| Week 5 | Lyrics Panel           | LRCLIB API. LRC parser. Synced scroll. Fallbacks.                    |
+| Week 6 | Library + Search       | Full library grid. Album expand. Live search with grouping.          |
+| Week 7 | Polish + Shortcuts     | Keyboard shortcuts. Page transitions. Performance audit.             |
+| Week 8 | Deploy                 | Deploy to Vercel (free). Final polish. Share with friends.           |
+
+---
+
+## 10. Open Questions
+
+| Question              | Notes                                                      |
+|-----------------------|------------------------------------------------------------|
+| Visualizer style      | Bars vs circular waveform â€” decide in Week 4               |
+| EQ persistence        | Store settings in localStorage? Decide in Week 4           |
+| Crossfade             | Auto-crossfade between tracks â€” nice to have               |
+| Mini player           | Floating mini player on other pages â€” Week 7 stretch goal  |
+| Light mode            | Dark only in v1, light mode in v2                          |
+| Multiple folders      | v1 = one folder. Multi-folder in v2                        |
+| PWA / installable     | Easy to add â€” good v1 stretch goal                         |
+
+---
+
+*AURA PRD v1.0 Â· Built with Next.js Â· Framer Motion Â· Web Audio API Â· LRCLIB*
+
