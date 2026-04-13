@@ -1,23 +1,44 @@
 "use client";
 
 import { Upload } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/frontend/components/ui/Button";
+import { usePlayerStore } from "@/frontend/store/player.store";
 
 export function UploadButton() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const refreshLibrary = usePlayerStore((state) => state.refreshLibrary);
 
   const handleFiles = async (files: FileList) => {
-    for (const file of Array.from(files)) {
-      const form = new FormData();
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const form = new FormData();
+        form.append("file", file);
 
-      form.append("file", file);
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: form
+        });
 
-      await fetch("/api/upload", {
-        method: "POST",
-        body: form
-      });
+        const result = await response.json();
+        
+        if (!response.ok) {
+          alert(result.error || "Upload failed");
+          continue;
+        }
+      }
+      
+      // Refresh the library state to show new songs instantly
+      await refreshLibrary();
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("An error occurred during upload.");
+    } finally {
+      setIsUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
@@ -40,8 +61,9 @@ export function UploadButton() {
         onClick={() => inputRef.current?.click()}
         type="button"
         variant="secondary"
+        disabled={isUploading}
       >
-        Upload Songs
+        {isUploading ? "Uploading..." : "Upload Songs"}
       </Button>
     </>
   );
