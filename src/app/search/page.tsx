@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Search, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { SongRow } from "@/frontend/components/library/SongRow";
@@ -13,7 +13,7 @@ import { GlassCard } from "@/frontend/components/ui/GlassCard";
 import { getAlbumGroups, getArtistGroups, sumDuration } from "@/frontend/lib/utils";
 import { usePlayerStore } from "@/frontend/store/player.store";
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -286,6 +286,14 @@ export default function SearchPage() {
         </GlassCard>
       </div>
     </motion.main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-white">Loading Search...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }
 
