@@ -226,10 +226,7 @@ export const usePlayerStore = create<PlayerStore>()(
         if (get().hasInitialized) {
           return;
         }
-        await get().refreshLibrary();
-        set({ hasInitialized: true });
-      },
-      refreshLibrary: async () => {
+
         let preloadedSongs: Song[] = [];
         try {
           const response = await fetch("/api/songs/preloaded");
@@ -242,10 +239,10 @@ export const usePlayerStore = create<PlayerStore>()(
               const metadata = shouldEnrich ? await parseMetadataFromUrl(song.audio_url) : null;
               const poster = shouldEnrich
                 ? await getPoster({
-                    title: metadata?.title ?? song.title,
-                    artist: metadata?.artist ?? song.artist ?? "",
-                    genre: metadata?.genre ?? song.genre ?? ""
-                  })
+                  title: metadata?.title ?? song.title,
+                  artist: metadata?.artist ?? song.artist ?? "",
+                  genre: metadata?.genre ?? song.genre ?? ""
+                })
                 : song.poster_url ?? null;
 
               return normalizeSong({
@@ -269,37 +266,55 @@ export const usePlayerStore = create<PlayerStore>()(
         let uploadedSongs: Song[] = [];
         try {
           const { supabase } = await import("@/backend/supabase/client");
-          if (supabase) {
-            const { data } = await supabase
-              .from("songs")
-              .select("*")
-              .order("uploaded_at", { ascending: false });
-
-            uploadedSongs = (data ?? [])
-              .filter(
-                (song): song is Partial<Song> & { id: string; title: string; audio_url: string } =>
-                  typeof song.id === "string" &&
-                  typeof song.title === "string" &&
-                  typeof song.audio_url === "string"
-              )
-              .map((song) =>
-                normalizeSong({
-                  ...song,
-                  source: "uploaded",
-                  folder: "Shared Library"
-                })
-              );
+          if (!supabase) {
+            set((state) => ({
+              songs: [...preloadedSongs],
+              currentIndex:
+                state.currentIndex >= 0 ? state.currentIndex : preloadedSongs.length ? 0 : -1,
+              duration:
+                state.currentIndex >= 0 ? state.duration : preloadedSongs[0]?.duration ?? 0,
+              hasInitialized: true
+            }));
+            return;
           }
+
+          const { data } = await supabase
+            .from("songs")
+            .select("*")
+            .order("uploaded_at", { ascending: false });
+
+          uploadedSongs = (data ?? [])
+            .filter(
+              (song): song is Partial<Song> & { id: string; title: string; audio_url: string } =>
+                typeof song.id === "string" &&
+                typeof song.title === "string" &&
+                typeof song.audio_url === "string"
+            )
+            .map((song) =>
+              normalizeSong({
+                ...song,
+                source: "uploaded",
+                folder: "Shared Library"
+              })
+            );
         } catch {
           uploadedSongs = [];
         }
 
-        const allSongs = [...preloadedSongs, ...uploadedSongs];
-        const activeSongId = get().songs[get().currentIndex]?.id;
-        
+        const allSongs = shuffleArray([...preloadedSongs, ...uploadedSongs]);
         set((state) => ({
           songs: allSongs,
-          currentIndex: activeSongId ? allSongs.findIndex(s => s.id === activeSongId) : (allSongs.length > 0 ? 0 : -1),
+          currentIndex:
+            state.currentIndex >= 0
+              ? state.currentIndex
+              : allSongs.length
+                ? 0
+                : -1,
+          duration:
+            state.currentIndex >= 0
+              ? state.duration
+              : allSongs[0]?.duration ?? 0,
+          hasInitialized: true
         }));
       }
     }),

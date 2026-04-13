@@ -1,44 +1,42 @@
 "use client";
 
-import { Upload } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { Button } from "@/frontend/components/ui/Button";
-import { usePlayerStore } from "@/frontend/store/player.store";
 
 export function UploadButton() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const refreshLibrary = usePlayerStore((state) => state.refreshLibrary);
 
   const handleFiles = async (files: FileList) => {
     setIsUploading(true);
-    try {
-      for (const file of Array.from(files)) {
-        const form = new FormData();
-        form.append("file", file);
+    for (const file of Array.from(files)) {
+      const form = new FormData();
 
-        const response = await fetch("/api/upload", {
+      form.append("file", file);
+
+      try {
+        const res = await fetch("/api/upload", {
           method: "POST",
           body: form
         });
 
-        const result = await response.json();
-        
-        if (!response.ok) {
-          alert(result.error || "Upload failed");
-          continue;
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          alert(`Upload failed for ${file.name}: ${errorData?.error || res.statusText}`);
+        } else {
+          alert(`Upload successful for ${file.name}!`);
         }
+      } catch (err: any) {
+        alert(`Error uploading ${file.name}: ${err.message}`);
       }
-      
-      // Refresh the library state to show new songs instantly
-      await refreshLibrary();
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("An error occurred during upload.");
-    } finally {
-      setIsUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
+    }
+    setIsUploading(false);
+    
+    // Clear the input so selecting the same file again works
+    if (inputRef.current) {
+      inputRef.current.value = "";
     }
   };
 
@@ -57,11 +55,11 @@ export function UploadButton() {
         type="file"
       />
       <Button
-        icon={<Upload className="h-4 w-4" />}
+        disabled={isUploading}
+        icon={isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
         onClick={() => inputRef.current?.click()}
         type="button"
         variant="secondary"
-        disabled={isUploading}
       >
         {isUploading ? "Uploading..." : "Upload Songs"}
       </Button>
