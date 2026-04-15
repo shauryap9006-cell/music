@@ -1,16 +1,36 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
 
+const allowedContentTypes = ['audio/mpeg', 'audio/flac', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/mp4'];
+const allowedPathPrefix = "library/";
+
+function isSafeUploadPath(pathname: string) {
+  return (
+    pathname.startsWith(allowedPathPrefix) &&
+    pathname.length <= 220 &&
+    !pathname.includes("..") &&
+    !pathname.includes("\\")
+  );
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
-  const body = (await request.json()) as HandleUploadBody;
+  let body: HandleUploadBody;
+  try {
+    body = (await request.json()) as HandleUploadBody;
+  } catch {
+    return NextResponse.json({ error: "invalid JSON payload" }, { status: 400 });
+  }
 
   try {
     const jsonResponse = await handleUpload({
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
+        if (!isSafeUploadPath(pathname)) {
+          throw new Error("Invalid upload pathname.");
+        }
         return {
-          allowedContentTypes: ['audio/mpeg', 'audio/flac', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/mp4'],
+          allowedContentTypes,
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {

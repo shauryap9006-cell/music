@@ -111,6 +111,7 @@ function SearchContent() {
         <div className="flex items-center gap-4 rounded-[28px] border border-white/10 bg-black/20 px-5 py-5">
           <Search className="h-6 w-6 text-[var(--text-muted)]" />
           <input
+            aria-label="Search songs, albums, or artists"
             className="w-full bg-transparent text-2xl text-white outline-none placeholder:text-[var(--text-muted)]"
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => {

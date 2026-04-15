@@ -1,5 +1,7 @@
-import { readFile, stat } from "fs/promises";
+import { createReadStream } from "fs";
+import { stat } from "fs/promises";
 import path from "path";
+import { Readable } from "stream";
 import { NextRequest, NextResponse } from "next/server";
 
 const mimeByExtension: Record<string, string> = {
@@ -21,9 +23,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const fileStats = await stat(filePath);
-    const buffer = await readFile(filePath);
     const contentType = mimeByExtension[extension] ?? "application/octet-stream";
     const range = request.headers.get("range");
+    const cacheControl = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400";
 
     if (range) {
       const match = /bytes=(\d+)-(\d*)/.exec(range);
@@ -33,25 +35,35 @@ export async function GET(request: NextRequest) {
         const end = Math.min(requestedEnd, fileStats.size - 1);
 
         if (start <= end && start < fileStats.size) {
-          const chunk = buffer.subarray(start, end + 1);
-          return new NextResponse(chunk, {
+          const stream = createReadStream(filePath, { start, end });
+          return new NextResponse(Readable.toWeb(stream) as ReadableStream, {
             status: 206,
             headers: {
               "Accept-Ranges": "bytes",
-              "Cache-Control": "public, max-age=3600",
-              "Content-Length": String(chunk.length),
+              "Cache-Control": cacheControl,
+              "Content-Length": String(end - start + 1),
               "Content-Range": `bytes ${start}-${end}/${fileStats.size}`,
               "Content-Type": contentType
             }
           });
         }
       }
+      return new NextResponse(null, {
+        status: 416,
+        headers: {
+          "Accept-Ranges": "bytes",
+          "Cache-Control": cacheControl,
+          "Content-Range": `bytes */${fileStats.size}`,
+          "Content-Type": contentType
+        }
+      });
     }
 
-    return new NextResponse(buffer, {
+    const stream = createReadStream(filePath);
+    return new NextResponse(Readable.toWeb(stream) as ReadableStream, {
       headers: {
         "Accept-Ranges": "bytes",
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": cacheControl,
         "Content-Length": String(fileStats.size),
         "Content-Type": contentType
       }

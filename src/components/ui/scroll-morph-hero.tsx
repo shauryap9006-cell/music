@@ -243,7 +243,7 @@ FlipCard.displayName = "FlipCard";
 
 export const MAX_SCROLL = 10000;
 
-export function IntroAnimation({ virtualScroll }: { virtualScroll: MotionValue<number> }) {
+export function IntroAnimation({ virtualScroll, startAnimation = true }: { virtualScroll: MotionValue<number>; startAnimation?: boolean }) {
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -270,19 +270,19 @@ export function IntroAnimation({ virtualScroll }: { virtualScroll: MotionValue<n
 
     const hasRun = useRef(false);
     useEffect(() => {
-        if (hasRun.current) return;
+        if (!startAnimation || hasRun.current) return;
         hasRun.current = true;
 
         const sequence = async () => {
-            // Wait for mounting to stabilize
-            await new Promise(r => setTimeout(r, 1000));
+            // Wait for mounting to stabilize or animation trigger
+            await new Promise(r => setTimeout(r, 300));
             // Phase 0 -> 1 (Scatter to Line)
             await animate(phaseProgress, 1, { duration: 2, ease: "easeInOut" });
             // Phase 1 -> 2 (Line to Circle)
             await animate(phaseProgress, 2, { duration: 1.5, ease: "easeInOut" });
         };
         sequence();
-    }, [phaseProgress]);
+    }, [phaseProgress, startAnimation]);
 
     useEffect(() => {
         const container = containerRef.current;

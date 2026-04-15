@@ -1,10 +1,18 @@
-import { parseBlob } from "music-metadata";
-
 import { createArtworkCacheKey } from "@/frontend/lib/artwork";
 import type { AudioExtension, Song } from "@/frontend/types";
 import { hashToColor, stripFileDecorators } from "@/frontend/lib/utils";
 
 const supportedExtensions = new Set<AudioExtension>(["mp3", "flac", "wav", "ogg"]);
+
+let parseBlobLoader: (typeof import("music-metadata"))["parseBlob"] | null = null;
+
+async function getParseBlob() {
+  if (!parseBlobLoader) {
+    const module = await import("music-metadata");
+    parseBlobLoader = module.parseBlob;
+  }
+  return parseBlobLoader;
+}
 
 function getExtension(fileName: string) {
   return fileName.split(".").pop()?.toLowerCase() as AudioExtension | undefined;
@@ -62,6 +70,7 @@ export async function extractDominantColor(imageUrl: string | undefined, fallbac
 
 export async function parseMetadataFromUrl(audioUrl: string) {
   try {
+    const parseBlob = await getParseBlob();
     const response = await fetch(audioUrl);
     const blob = await response.blob();
     const metadata = await parseBlob(blob);
@@ -97,10 +106,11 @@ export async function parseSongFiles(fileInput: FileList | File[]) {
       const fallbackTitle = stripFileDecorators(file.name);
 
       let metadata:
-        | Awaited<ReturnType<typeof parseBlob>>
+        | Awaited<ReturnType<(typeof import("music-metadata"))["parseBlob"]>>
         | undefined;
 
       try {
+        const parseBlob = await getParseBlob();
         metadata = await parseBlob(file, { duration: true });
       } catch {
         metadata = undefined;

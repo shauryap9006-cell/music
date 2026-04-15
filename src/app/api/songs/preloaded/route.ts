@@ -103,7 +103,7 @@ export async function GET() {
           directory: previewDirectory,
           filename,
           id: `preloaded-${index}-${filename}`,
-          audioUrl: `/preview-songs/${filename}`,
+          audioUrl: `/preview-songs/${encodeURIComponent(filename)}`,
           folder: "Preview Songs",
           scope: "preview"
         })
@@ -142,6 +142,10 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json([...previewSongs, ...librarySongs, ...userSongs]);
+  return NextResponse.json([...previewSongs, ...librarySongs, ...userSongs], {
+    headers: {
+      "Cache-Control": "public, max-age=120, s-maxage=120, stale-while-revalidate=600"
+    }
+  });
 }
 

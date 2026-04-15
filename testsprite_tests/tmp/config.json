@@ -1,0 +1,22 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://127.0.0.1:3000",
+  "executionArgs": {
+    "projectName": "music",
+    "projectPath": "c:\\Users\\shaur\\OneDrive\\hakathon\\music",
+    "testIds": [
+      "TC001",
+      "TC002",
+      "TC003"
+    ],
+    "additionalInstruction": "Run only the first 3 high priority tests to avoid server overload.",
+    "serverMode": "production",
+    "envs": {
+      "API_KEY": "sk-user-_OBJSn2wg2-d2TojJFtk0bSxABtY4V1B9k8eZypwX2h-KVer8WqtaTxku0H0dYWrY5stuJ0gDWCiCa-E28MddLemSqIPeqzEFKJr9fBaOTD3jT4k4u3SzMVuLBgb-4ZXuYs"
+    }
+  },
+  "serverPort": 51016,
+  "proxy": "http://0b9f27a1-57c7-431c-9f4a-66dd28799ce6:xWBX2V82tKnvGsqssZR0WJ3EL12BYyGJ@tun.testsprite.com:8080"
+}

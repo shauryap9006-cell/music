@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { AudioProvider } from "@/frontend/components/providers/AudioProvider";
 import { BottomPlayer } from "@/frontend/components/player/BottomPlayer";
 import { usePlayerStore } from "@/frontend/store/player.store";
+import { ThemeProvider } from "next-themes";
 import "@/frontend/styles/globals.css";
 
 const syne = Syne({
@@ -44,6 +45,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     return (
         <html lang="en">
             <head>
+                <title>Aura Music Player</title>
+                <meta
+                    name="description"
+                    content="Aura is a cinematic music player for searching, organizing, and playing your audio collection."
+                />
                 <style dangerouslySetInnerHTML={{
                     __html: `
           @import url('https://fonts.googleapis.com/css2?family=Fascinate+Inline&display=swap');
@@ -91,14 +97,16 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             </head>
             <body className={`${syne.variable} ${dmSans.variable} ${dmMono.variable} ${cormorant.variable}`}>
                 <AudioProvider>
-                    <div className="pointer-events-none fixed inset-0 overflow-hidden">
-                        <div className="hero-grid absolute inset-0 opacity-20" />
-                        <div className="absolute left-[-10%] top-[-12%] h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(circle,rgba(30,41,59,0.20),transparent_65%)] opacity-40 blur-3xl" />
-                        <div className="absolute right-[-12%] top-[18%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(15,23,42,0.18),transparent_70%)] opacity-35 blur-3xl" />
-                        <div className="absolute bottom-[-12%] left-[30%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(30,58,95,0.15),transparent_70%)] opacity-25 blur-3xl" />
-                    </div>
-                    <div className="relative min-h-screen pb-20">{children}</div>
-                    <BottomPlayer />
+                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+                        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+                            <div className="hero-grid absolute inset-0 opacity-20" />
+                            <div className="absolute left-[-10%] top-[-12%] h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(circle,rgba(30,41,59,0.20),transparent_65%)] opacity-40 blur-3xl" />
+                            <div className="absolute right-[-12%] top-[18%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(15,23,42,0.18),transparent_70%)] opacity-35 blur-3xl" />
+                            <div className="absolute bottom-[-12%] left-[30%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(30,58,95,0.15),transparent_70%)] opacity-25 blur-3xl" />
+                        </div>
+                        <div className="relative min-h-screen pb-20">{children}</div>
+                        <BottomPlayer />
+                    </ThemeProvider>
                 </AudioProvider>
             </body>
         </html>

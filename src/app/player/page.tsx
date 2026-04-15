@@ -3,17 +3,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ListMusic, Mic2, SlidersHorizontal } from "lucide-react";
 
-import { EQPanel } from "@/frontend/components/equalizer/EQPanel";
-import { LyricsPanel } from "@/frontend/components/lyrics/LyricsPanel";
 import { useAudioController } from "@/frontend/components/providers/AudioProvider";
 import { VinylPlayer } from "@/frontend/components/player/VinylPlayer";
 import { Playlist } from "@/frontend/components/sidebar/Playlist";
 import { UploadButton } from "@/frontend/components/upload/UploadButton";
 import { useLibrarySync } from "@/frontend/hooks/useLibrarySync";
+
+const EQPanel = dynamic(
+  () => import("@/frontend/components/equalizer/EQPanel").then((module) => module.EQPanel),
+  { ssr: false, loading: () => <div className="h-full w-full animate-pulse rounded-3xl bg-white/[0.04]" /> }
+);
+const LyricsPanel = dynamic(
+  () => import("@/frontend/components/lyrics/LyricsPanel").then((module) => module.LyricsPanel),
+  { ssr: false, loading: () => <div className="h-full w-full animate-pulse rounded-3xl bg-white/[0.04]" /> }
+);
 
 const navigationItems: Array<{ href: Route; label: string }> = [
   { href: "/", label: "Home" },

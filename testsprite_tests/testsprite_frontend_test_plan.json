@@ -1,0 +1,618 @@
+[
+  {
+    "id": "TC001",
+    "title": "Load a supported music folder and populate the sidebar library",
+    "description": "User opens a local folder with supported audio files and the app populates the sidebar/library with parsed track metadata.",
+    "category": "Folder Loading",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local folder containing supported audio files"
+      },
+      {
+        "type": "action",
+        "description": "Grant the browser permission to read the selected directory"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the song list is populated in the sidebar/library"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Start playback and control play/pause, seek, and volume",
+    "description": "User plays a selected track and can pause/resume, seek to a new position, and change volume while playback continues with playhead progress updating.",
+    "category": "Audio Playback",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local folder containing supported audio files"
+      },
+      {
+        "type": "action",
+        "description": "Grant the browser permission to read the selected directory"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Seek to a new position in the track"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the volume to a different level"
+      },
+      {
+        "type": "action",
+        "description": "Toggle playback to pause"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify playback is paused and the playhead position reflects the seeked location"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Skip to next track and return to previous track during playback",
+    "description": "User advances to the next track and returns to the previous track while playback remains functional and the current track changes accordingly.",
+    "category": "Audio Playback",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local folder containing supported audio files"
+      },
+      {
+        "type": "action",
+        "description": "Grant the browser permission to read the selected directory"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Advance to the next track"
+      },
+      {
+        "type": "action",
+        "description": "Return to the previous track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the currently playing track updates when using next and previous controls"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Lyrics stay highlighted in sync during playback and after seeking",
+    "description": "Verifies that synced lyrics load for a playing track and the current line highlight remains in sync after the user seeks mid-song.",
+    "category": "Synced Lyrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Open the lyrics panel"
+      },
+      {
+        "type": "action",
+        "description": "Seek to a later point in the track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current lyric line is highlighted and updates over time during playback"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the highlighted lyric line changes appropriately after seeking"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Visualizer animates in real time during playback",
+    "description": "User starts playback and the visualizer bars respond in real time to the audio output.",
+    "category": "Visualizer & EQ",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local folder containing supported audio files"
+      },
+      {
+        "type": "action",
+        "description": "Grant the browser permission to read the selected directory"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the visualizer is animating and reacting to the audio during playback"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Embedded artwork displays automatically when available",
+    "description": "Verifies that selecting a track with embedded artwork shows album art immediately for that track.",
+    "category": "Artwork Resolution",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library that has embedded artwork"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify album artwork is displayed for the selected track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the artwork is not a generic placeholder"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Artwork resolves for tracks without embedded art",
+    "description": "Verifies that selecting a track without embedded art results in artwork being displayed after resolution completes.",
+    "category": "Artwork Resolution",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library that does not contain embedded artwork"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the artwork area to update"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify album artwork is displayed for the selected track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the displayed artwork corresponds to the current track selection rather than a previously selected track"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Artwork updates correctly when switching tracks quickly",
+    "description": "Verifies that rapid track changes do not cause artwork from a previous track to remain visible for the current selection.",
+    "category": "Artwork Resolution",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Quickly select a different track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Quickly select another different track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the artwork area to settle"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the displayed artwork corresponds to the currently selected track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the artwork does not revert to a previous track after it updates"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC009",
+    "title": "Lyrics update to match the newly selected track during rapid switching",
+    "description": "Verifies that switching tracks quickly results in the lyrics panel showing lyrics for the current track only and not a previous selection.",
+    "category": "Synced Lyrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Open the lyrics panel"
+      },
+      {
+        "type": "action",
+        "description": "Quickly select a different track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Quickly select another different track from the library"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the lyrics panel content corresponds to the currently selected track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the highlighted lyric line updates over time for the current track"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC010",
+    "title": "Artwork remains consistent through play/pause and track navigation",
+    "description": "Verifies that using play/pause and next/previous track controls keeps the artwork in sync with the currently selected track.",
+    "category": "Artwork Resolution",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Pause playback"
+      },
+      {
+        "type": "action",
+        "description": "Resume playback"
+      },
+      {
+        "type": "action",
+        "description": "Skip to the next track"
+      },
+      {
+        "type": "action",
+        "description": "Skip to the previous track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the displayed artwork matches the currently selected track after navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the artwork area displays a single resolved image rather than multiple competing states"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC011",
+    "title": "Lyrics panel remains stable when switching between playback controls",
+    "description": "Verifies that using pause/resume and next/previous track controls does not leave the lyrics panel in an inconsistent state.",
+    "category": "Synced Lyrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Open the lyrics panel"
+      },
+      {
+        "type": "action",
+        "description": "Pause playback"
+      },
+      {
+        "type": "action",
+        "description": "Resume playback"
+      },
+      {
+        "type": "action",
+        "description": "Skip to the next track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the lyrics panel shows lyrics or a no-lyrics state for the currently playing track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current lyric highlight updates when playback is running"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC012",
+    "title": "Adjust 5-band EQ and apply a preset without breaking playback",
+    "description": "User opens the EQ panel, changes multiple frequency bands and applies a preset, and playback continues without interruption while the EQ state updates.",
+    "category": "Visualizer & EQ",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local folder containing supported audio files"
+      },
+      {
+        "type": "action",
+        "description": "Grant the browser permission to read the selected directory"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Open the EQ panel"
+      },
+      {
+        "type": "action",
+        "description": "Move a low-frequency band slider to a different position"
+      },
+      {
+        "type": "action",
+        "description": "Move a high-frequency band slider to a different position"
+      },
+      {
+        "type": "action",
+        "description": "Select an EQ preset"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify playback continues and the EQ panel reflects the applied adjustments/preset"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC013",
+    "title": "User can manually scroll lyrics without breaking playback state",
+    "description": "Verifies that the user can scroll the lyrics view to inspect surrounding lines while playback continues normally.",
+    "category": "Synced Lyrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Open the lyrics panel"
+      },
+      {
+        "type": "action",
+        "description": "Scroll the lyrics list to a different section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify playback is still running"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the lyrics panel remains usable and displays lyric lines"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "AI poster fallback shows when no artwork sources are available",
+    "description": "Verifies that when embedded and other artwork sources are not available for a track, a poster-style fallback image is displayed.",
+    "category": "Artwork Resolution",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library that results in no embedded artwork being available"
+      },
+      {
+        "type": "action",
+        "description": "Wait for artwork resolution to complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a fallback poster-style artwork is displayed for the selected track"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the fallback artwork is not the same as the previously displayed track artwork"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Clear empty state when synced lyrics are unavailable",
+    "description": "Verifies that when a track has no synced lyrics available, the lyrics panel shows a clear not-found state rather than stale or mismatched lyrics.",
+    "category": "Synced Lyrics",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local music folder using the folder picker"
+      },
+      {
+        "type": "action",
+        "description": "Select a track from the library"
+      },
+      {
+        "type": "action",
+        "description": "Start playback"
+      },
+      {
+        "type": "action",
+        "description": "Open the lyrics panel"
+      },
+      {
+        "type": "action",
+        "description": "Select a different track from the library that results in no synced lyrics being available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a clear no-lyrics-available state is shown in the lyrics panel"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify lyrics from the previously selected track are not shown"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC016",
+    "title": "Handle a folder with no playable audio files",
+    "description": "User opens a local folder with no supported audio files and the app shows an empty-library state indicating no playable files were found.",
+    "category": "Folder Loading",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /player"
+      },
+      {
+        "type": "action",
+        "description": "Open a local folder containing no supported audio files"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty-library state is displayed indicating no playable files were found"
+      }
+    ],
+    "priority": "Low"
+  }
+]

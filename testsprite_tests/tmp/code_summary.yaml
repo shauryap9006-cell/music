@@ -1,0 +1,99 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js (App Router)
+  - Tailwind CSS
+  - Framer Motion
+  - Howler.js
+  - Zustand
+  - Web Audio API
+routes:
+  - path: /
+    file: src/app/page.tsx
+    auth_required: false
+    description: Hero landing page with cinematic animations
+  - path: /player
+    file: src/app/player/page.tsx
+    auth_required: false
+    description: Main music player experience with visualizer and lyrics
+  - path: /library
+    file: src/app/library/page.tsx
+    auth_required: false
+    description: Browse local song collection in grid/list view
+  - path: /search
+    file: src/app/search/page.tsx
+    auth_required: false
+    description: Live search page for the local library
+features:
+  - name: Folder Loading
+    description: Select a local folder to load music files and parse metadata
+    files:
+      - src/components/sidebar/Playlist.tsx
+      - src/lib/metadata.ts
+      - src/store/player.store.ts
+    entry_route: /player
+    user_interactions:
+      - Click "Open Folder" button
+      - Select a directory containing MP3/WAV files
+      - View song list populated in the sidebar
+    api_calls: []
+    auth_required: false
+  - name: Audio Playback
+    description: Core playback controls and audio engine
+    files:
+      - src/hooks/useAudio.ts
+      - src/components/player/Controls.tsx
+    entry_route: /player
+    user_interactions:
+      - Click Play/Pause toggle
+      - Click Next/Previous track
+      - Use seek bar to change position
+      - Adjust volume slider
+    api_calls: []
+    auth_required: false
+  - name: Visualizer & EQ
+    description: Real-time frequency visualizer and 5-band equalizer
+    files:
+      - src/components/player/Visualizer.tsx
+      - src/components/equalizer/EQPanel.tsx
+      - src/hooks/useVisualizer.ts
+      - src/hooks/useEqualizer.ts
+    entry_route: /player
+    user_interactions:
+      - View animated bars responding to music
+      - Toggle EQ panel
+      - Move frequency sliders
+      - Select EQ presets
+    api_calls: []
+    auth_required: false
+  - name: Synced Lyrics
+    description: Fetches and displays synchronized lyrics from LRCLIB
+    files:
+      - src/components/lyrics/LyricsPanel.tsx
+      - src/hooks/useLyrics.ts
+      - src/app/api/lyrics/route.ts
+    entry_route: /player
+    user_interactions:
+      - View current lyric line highlighted and scaled
+      - Scroll through lyrics manually
+    api_calls:
+      - method: GET
+        endpoint: https://lrclib.net/api/get
+    auth_required: false
+  - name: Artwork Resolution
+    description: Multi-layer artwork resolution (Embedded -> iTunes -> AI)
+    files:
+      - src/app/api/artwork/route.ts
+      - src/hooks/useArtwork.ts
+      - src/lib/artwork.ts
+    entry_route: /player
+    user_interactions:
+      - See album art for every track automatically
+    api_calls:
+      - method: GET
+        endpoint: /api/artwork
+      - method: GET
+        endpoint: https://itunes.apple.com/search
+    auth_required: false
+known_limitations: []

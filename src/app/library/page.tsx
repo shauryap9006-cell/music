@@ -163,6 +163,7 @@ export default function LibraryPage() {
               {/* View Toggle */}
               <div className="flex items-center gap-0.5 rounded-full border border-white/8 bg-white/[0.04] p-1">
                 <button
+                  aria-label="Switch to grid view"
                   className={`rounded-full p-1.5 transition-all ${view === "grid" ? "bg-white text-zinc-950 shadow-md" : "text-white/40 hover:text-white hover:bg-white/5"}`}
                   onClick={() => setView("grid")}
                   type="button"
@@ -170,6 +171,7 @@ export default function LibraryPage() {
                   <Grid2X2 className="h-3.5 w-3.5" />
                 </button>
                 <button
+                  aria-label="Switch to list view"
                   className={`rounded-full p-1.5 transition-all ${view === "list" ? "bg-white text-zinc-950 shadow-md" : "text-white/40 hover:text-white hover:bg-white/5"}`}
                   onClick={() => setView("list")}
                   type="button"
