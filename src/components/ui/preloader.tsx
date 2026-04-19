@@ -7,18 +7,18 @@ import dynamic from "next/dynamic"
 const DottedSurface = dynamic(() => import("@/components/ui/dotted-surface").then(mod => mod.DottedSurface), { ssr: false })
 
 const words = [
-  "Hello",        // English
-  "नमस्ते",       // Hindi
-  "Bonjour",      // French
-  "Ciao",         // Italian
-  "Olà",          // Portuguese (already present)
-  "やあ",         // Japanese
-  "Hallå",        // Swedish
-  "Guten tag",    // German
-  "হ্যালো",       // Bengali
-  "Hola",         // Spanish
-  "नमस्कार",      // Marathi
-  "Olá"           // Portuguese (correct spelling)
+  "Hello",
+  "नमस्ते",
+  "Bonjour",
+  "Ciao",
+  "Olá",
+  "やあ",
+  "Hallå",
+  "Guten tag",
+  "হ্যালো",
+  "Hola",
+  "नमस्कार",
+  "Olá"
 ];
 
 const textSuck = {

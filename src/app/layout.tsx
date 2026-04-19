@@ -9,6 +9,7 @@ import { BottomPlayer } from "@/frontend/components/player/BottomPlayer";
 import { usePlayerStore } from "@/frontend/store/player.store";
 import { ThemeProvider } from "next-themes";
 import "@/frontend/styles/globals.css";
+import CustomCursor from "@/frontend/components/ui/custom-cursor";
 
 const syne = Syne({
     subsets: ["latin"],
@@ -104,7 +105,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                             <div className="absolute right-[-12%] top-[18%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(15,23,42,0.18),transparent_70%)] opacity-35 blur-3xl" />
                             <div className="absolute bottom-[-12%] left-[30%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(30,58,95,0.15),transparent_70%)] opacity-25 blur-3xl" />
                         </div>
-                        <div className="relative min-h-screen pb-20">{children}</div>
+                        <div className="relative min-h-screen pb-20">
+                            <CustomCursor />
+                            {children}
+                        </div>
                         <BottomPlayer />
                     </ThemeProvider>
                 </AudioProvider>

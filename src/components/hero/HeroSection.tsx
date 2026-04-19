@@ -9,22 +9,22 @@ import { Play, Library } from "lucide-react";
 import { useAudioController } from "@/frontend/components/providers/AudioProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 const centerWords = [
-  "Hello",        // English
-  "Bonjour",      // French
-  "Ciao",         // Italian
-  "Olà",          // Portuguese (already present)
-  "やあ",         // Japanese
-  "Hallå",        // Swedish
-  "Guten tag",    // German
-  "হ্যালো",       // Bengali
-  "नमस्ते",       // Hindi
-  "Hola",         // Spanish
-  "नमस्कार",      // Marathi
-  "ਸਤ ਸ੍ਰੀ ਅਕਾਲ", // Punjabi
-  "Olá"           // Portuguese (correct spelling)
+  "Welcome",        // English
+  "Bienvenue",      // French
+  "Benvenuto",      // Italian
+  "Bem-vindo",      // Portuguese
+  "ようこそ",        // Japanese
+  "Välkommen",      // Swedish
+  "Willkommen",     // German
+  "স্বাগতম",        // Bengali
+  "स्वागत है",      // Hindi
+  "Bienvenido",     // Spanish
+  "स्वागत",         // Marathi
+  "ਜੀ ਆਇਆਂ ਨੂੰ",   // Punjabi
+  "Bem-vindo"       // Portuguese (correct spelling)
 ];
+
 
 export function HeroSection() {
   const [showPreloader, setShowPreloader] = useState(true);
@@ -189,7 +189,7 @@ export function HeroSection() {
                 style={{ opacity: titleOpacity, y: titleY }}
                 className="text-5xl md:text-8xl font-fascinate tracking-wide text-white mb-4 uppercase"
               >
-                MODI <span className="text-zinc-500 underline decoration-zinc-800 underline-offset-12">MUSIC</span>
+                AURA <span className="text-zinc-500 underline decoration-zinc-800 underline-offset-12">MUSIC</span>
               </motion.h1>
 
               <motion.p
